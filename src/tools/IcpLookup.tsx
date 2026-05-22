@@ -22,21 +22,55 @@ export default function IcpLookup() {
     try {
       const domain = input.trim()
       if (!domain) throw new Error('请输入域名或备案号')
-      // Use ICP public query API
-      const res = await fetch(`https://api.vvhan.com/api/icp?url=${encodeURIComponent(domain)}`)
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
-      if (data.success && data.info) {
-        setResults([{
-          domain: data.info.domain || domain,
-          owner: data.info.unitName || '-',
-          type: data.info.nature || '-',
-          license: data.info.icp || '-',
-          siteName: data.info.siteName || '-',
-        }])
-      } else {
-        throw new Error(data.msg || '未查询到备案信息')
+
+      const errors: string[] = []
+      const apiUrl = `https://api.vvhan.com/api/icp?url=${encodeURIComponent(domain)}`
+
+      // Try direct request first
+      try {
+        const res = await fetch(apiUrl)
+        if (res.ok) {
+          const data = await res.json()
+          if (data.success && data.info) {
+            setResults([{
+              domain: data.info.domain || domain,
+              owner: data.info.unitName || '-',
+              type: data.info.nature || '-',
+              license: data.info.icp || '-',
+              siteName: data.info.siteName || '-',
+            }])
+            return
+          }
+          throw new Error(data.msg || '未查询到备案信息')
+        }
+        errors.push(`直接请求: HTTP ${res.status}`)
+      } catch (e) {
+        errors.push(`直接请求: ${(e as Error).message}`)
       }
+
+      // Fallback: CORS proxy
+      try {
+        const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (data.success && data.info) {
+            setResults([{
+              domain: data.info.domain || domain,
+              owner: data.info.unitName || '-',
+              type: data.info.nature || '-',
+              license: data.info.icp || '-',
+              siteName: data.info.siteName || '-',
+            }])
+            return
+          }
+          throw new Error(data.msg || '未查询到备案信息')
+        }
+        errors.push(`代理请求: HTTP ${res.status}`)
+      } catch (e) {
+        errors.push(`代理请求: ${(e as Error).message}`)
+      }
+
+      throw new Error(`查询失败:\n${errors.join('\n')}`)
     } catch (e) {
       setError((e as Error).message)
     } finally {
@@ -55,7 +89,7 @@ export default function IcpLookup() {
             {loading ? '查询中...' : '查询'}
           </ActionButton>
         </div>
-        {error && <div className="mt-2 text-sm text-red-500">{error}</div>}
+        {error && <div className="mt-2 text-sm text-red-500 whitespace-pre-line">{error}</div>}
       </Section>
 
       {results.length > 0 && (

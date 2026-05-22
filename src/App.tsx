@@ -35,6 +35,32 @@ export default function App() {
     document.documentElement.classList.toggle('dark', dark)
   }, [dark])
 
+  const routeTitles: Record<string, string> = {
+    '/': '套陆聚合站',
+    '/nav': '精选导航',
+    '/calculator': '进制计算器',
+    '/encoding': '编码转换',
+    '/crypto': '哈希 / 加解密',
+    '/json': 'JSON 格式化',
+    '/yaml': 'YAML 格式化',
+    '/subnet': '子网掩码计算',
+    '/datetime': '日期时间',
+    '/uuid': 'UUID 生成',
+    '/guid': 'GUID 生成',
+    '/url': 'URL 编解码',
+    '/rmb': '人民币大写',
+    '/armhex': 'ARM HEX 转换',
+    '/ip': 'IP 查询',
+    '/whois': 'WHOIS 查询',
+    '/icp': '网站备案查询',
+    '/api': 'API 测试',
+  }
+
+  useEffect(() => {
+    const title = routeTitles[location.pathname] || '套陆聚合站'
+    document.title = title
+  }, [location.pathname])
+
   // Standalone pages: no sidebar/topbar
   if (isHome || location.pathname === '/nav') {
     return (

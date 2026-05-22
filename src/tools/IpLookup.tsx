@@ -11,15 +11,14 @@ interface IpInfo {
   timezone?: string
 }
 
-// Normalize different API responses to a common format
-function normalizeIpApi(data: Record<string, unknown>): IpInfo {
+function normalizeIpapi(data: Record<string, unknown>): IpInfo {
   return {
-    ip: data.query as string || '',
+    ip: data.ip as string || '',
     city: data.city as string,
-    region: data.regionName as string,
-    country: data.country as string,
-    loc: data.lat && data.lon ? `${data.lat},${data.lon}` : undefined,
-    org: data.isp as string || data.org as string,
+    region: data.region as string,
+    country: data.country_name as string,
+    loc: data.latitude && data.longitude ? `${data.latitude},${data.longitude}` : undefined,
+    org: data.org as string,
     timezone: data.timezone as string,
   }
 }
@@ -54,8 +53,7 @@ async function fetchWithTimeout(url: string, ms = 5000): Promise<Response> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), ms)
   try {
-    const res = await fetch(url, { signal: controller.signal })
-    return res
+    return await fetch(url, { signal: controller.signal })
   } finally {
     clearTimeout(timer)
   }
@@ -64,23 +62,21 @@ async function fetchWithTimeout(url: string, ms = 5000): Promise<Response> {
 async function lookupIp(ip: string): Promise<IpInfo> {
   const errors: string[] = []
 
-  // API 1: ip-api.com (45 req/min, no HTTPS on free tier)
+  // API 1: ipapi.co (HTTPS + CORS, 1000 req/day)
   try {
-    const url = ip
-      ? `http://ip-api.com/json/${ip}?lang=zh-CN`
-      : 'http://ip-api.com/json/?lang=zh-CN'
+    const url = ip ? `https://ipapi.co/${ip}/json/` : 'https://ipapi.co/json/'
     const res = await fetchWithTimeout(url)
     if (res.ok) {
       const data = await res.json()
-      if (data.status === 'success') return normalizeIpApi(data)
-      throw new Error(data.message || 'ip-api 查询失败')
+      if (!data.error) return normalizeIpapi(data)
+      throw new Error(data.reason || 'ipapi.co 查询失败')
     }
-    errors.push(`ip-api: HTTP ${res.status}`)
+    errors.push(`ipapi.co: HTTP ${res.status}`)
   } catch (e) {
-    errors.push(`ip-api: ${(e as Error).message}`)
+    errors.push(`ipapi.co: ${(e as Error).message}`)
   }
 
-  // API 2: ipwho.is
+  // API 2: ipwho.is (HTTPS + CORS)
   try {
     const url = ip ? `https://ipwho.is/${ip}` : 'https://ipwho.is/'
     const res = await fetchWithTimeout(url)
@@ -94,7 +90,7 @@ async function lookupIp(ip: string): Promise<IpInfo> {
     errors.push(`ipwho.is: ${(e as Error).message}`)
   }
 
-  // API 3: ipinfo.io (fallback)
+  // API 3: ipinfo.io (HTTPS + CORS, fallback)
   try {
     const url = ip ? `https://ipinfo.io/${ip}/json` : 'https://ipinfo.io/json'
     const res = await fetchWithTimeout(url)
