@@ -11,97 +11,99 @@ interface IpInfo {
   timezone?: string
 }
 
-function normalizeIpapi(data: Record<string, unknown>): IpInfo {
-  return {
-    ip: data.ip as string || '',
-    city: data.city as string,
-    region: data.region as string,
-    country: data.country_name as string,
-    loc: data.latitude && data.longitude ? `${data.latitude},${data.longitude}` : undefined,
-    org: data.org as string,
-    timezone: data.timezone as string,
-  }
-}
-
-function normalizeIpWho(data: Record<string, unknown>): IpInfo {
-  const conn = data.connection as Record<string, unknown> | undefined
-  const tz = data.timezone as Record<string, unknown> | undefined
-  return {
-    ip: data.ip as string || '',
-    city: data.city as string,
-    region: data.region as string,
-    country: data.country as string,
-    loc: data.latitude && data.longitude ? `${data.latitude},${data.longitude}` : undefined,
-    org: (conn?.org as string) || (data.org as string),
-    timezone: tz?.id as string,
-  }
-}
-
-function normalizeIpinfo(data: Record<string, unknown>): IpInfo {
-  return {
-    ip: data.ip as string || '',
-    city: data.city as string,
-    region: data.region as string,
-    country: data.country as string,
-    loc: data.loc as string,
-    org: data.org as string,
-    timezone: data.timezone as string,
-  }
-}
-
-async function fetchWithTimeout(url: string, ms = 5000): Promise<Response> {
+async function fetchJson(url: string, ms = 8000): Promise<Record<string, unknown>> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), ms)
   try {
-    return await fetch(url, { signal: controller.signal })
+    const res = await fetch(url, { signal: controller.signal })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return await res.json()
   } finally {
     clearTimeout(timer)
+  }
+}
+
+// Try direct fetch, fallback to CORS proxy
+async function fetchWithProxy(url: string, ms = 8000): Promise<Record<string, unknown>> {
+  try {
+    return await fetchJson(url, ms)
+  } catch {
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+    return fetchJson(proxyUrl, ms + 4000)
   }
 }
 
 async function lookupIp(ip: string): Promise<IpInfo> {
   const errors: string[] = []
 
-  // API 1: ipapi.co (HTTPS + CORS, 1000 req/day)
+  // API 1: ipapi.co (HTTPS + CORS, rate limited 1000/day)
   try {
     const url = ip ? `https://ipapi.co/${ip}/json/` : 'https://ipapi.co/json/'
-    const res = await fetchWithTimeout(url)
-    if (res.ok) {
-      const data = await res.json()
-      if (!data.error) return normalizeIpapi(data)
-      throw new Error(data.reason || 'ipapi.co 查询失败')
+    const data = await fetchWithProxy(url)
+    if (!data.error) {
+      return {
+        ip: data.ip as string || '',
+        city: data.city as string,
+        region: data.region as string,
+        country: data.country_name as string,
+        loc: data.latitude && data.longitude ? `${data.latitude},${data.longitude}` : undefined,
+        org: data.org as string,
+        timezone: data.timezone as string,
+      }
     }
-    errors.push(`ipapi.co: HTTP ${res.status}`)
+    errors.push(`ipapi.co: ${data.reason || '查询失败'}`)
   } catch (e) {
     errors.push(`ipapi.co: ${(e as Error).message}`)
   }
 
-  // API 2: ipwho.is (HTTPS + CORS)
+  // API 2: ipwho.is (HTTPS)
   try {
     const url = ip ? `https://ipwho.is/${ip}` : 'https://ipwho.is/'
-    const res = await fetchWithTimeout(url)
-    if (res.ok) {
-      const data = await res.json()
-      if (data.success !== false) return normalizeIpWho(data)
-      throw new Error(data.message || 'ipwho.is 查询失败')
+    const data = await fetchWithProxy(url)
+    if (data.success !== false) {
+      const conn = data.connection as Record<string, unknown> | undefined
+      const tz = data.timezone as Record<string, unknown> | undefined
+      return {
+        ip: data.ip as string || '',
+        city: data.city as string,
+        region: data.region as string,
+        country: data.country as string,
+        loc: data.latitude && data.longitude ? `${data.latitude},${data.longitude}` : undefined,
+        org: (conn?.org as string) || (data.org as string),
+        timezone: tz?.id as string,
+      }
     }
-    errors.push(`ipwho.is: HTTP ${res.status}`)
+    errors.push(`ipwho.is: ${data.message || '查询失败'}`)
   } catch (e) {
     errors.push(`ipwho.is: ${(e as Error).message}`)
   }
 
-  // API 3: ipinfo.io (HTTPS + CORS, fallback)
+  // API 3: ipinfo.io
   try {
     const url = ip ? `https://ipinfo.io/${ip}/json` : 'https://ipinfo.io/json'
-    const res = await fetchWithTimeout(url)
-    if (res.ok) {
-      const data = await res.json()
-      if (!data.error) return normalizeIpinfo(data)
-      throw new Error(data.error?.message || 'ipinfo.io 查询失败')
+    const data = await fetchWithProxy(url)
+    if (!data.error) {
+      return {
+        ip: data.ip as string || '',
+        city: data.city as string,
+        region: data.region as string,
+        country: data.country as string,
+        loc: data.loc as string,
+        org: data.org as string,
+        timezone: data.timezone as string,
+      }
     }
-    errors.push(`ipinfo.io: HTTP ${res.status}`)
+    errors.push(`ipinfo.io: ${(data.error as Record<string, string>)?.message || '查询失败'}`)
   } catch (e) {
     errors.push(`ipinfo.io: ${(e as Error).message}`)
+  }
+
+  // API 4: ipify (IP only, no geo)
+  try {
+    const data = await fetchWithProxy('https://api.ipify.org/?format=json')
+    return { ip: data.ip as string || '' }
+  } catch (e) {
+    errors.push(`ipify: ${(e as Error).message}`)
   }
 
   throw new Error(`所有查询接口均失败:\n${errors.join('\n')}`)

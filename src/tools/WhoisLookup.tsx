@@ -1,70 +1,71 @@
 import { useState } from 'react'
 import ToolShell, { Section, TextareaWithCopy, ActionButton, TextInput } from '../components/ToolShell'
 
+async function fetchJson(url: string, ms = 10000): Promise<Record<string, unknown>> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), ms)
+  try {
+    const res = await fetch(url, { signal: controller.signal })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return await res.json()
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+async function fetchWithProxy(url: string, ms = 10000): Promise<Record<string, unknown>> {
+  try {
+    return await fetchJson(url, ms)
+  } catch {
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+    return fetchJson(proxyUrl, ms + 4000)
+  }
+}
+
 function formatRdap(data: Record<string, unknown>): string {
   const lines: string[] = []
 
-  // Domain name
   const name = data.ldhName as string
   if (name) lines.push(`Domain Name: ${name}`)
 
-  // Status
   const status = data.status as string[] | undefined
   if (status?.length) lines.push(`Status: ${status.join(', ')}`)
 
-  // Events (registration, expiry, etc.)
   const events = data.events as { eventAction: string; eventDate: string }[] | undefined
   if (events) {
+    const labels: Record<string, string> = {
+      registration: 'Created', expiration: 'Expires',
+      lastChanged: 'Updated', lastUpdateOfRdapDatabase: 'RDAP Updated',
+    }
     for (const e of events) {
-      const action: Record<string, string> = {
-        registration: 'Created',
-        expiration: 'Expires',
-        lastChanged: 'Updated',
-        lastUpdateOfRdapDatabase: 'RDAP Updated',
-      }
-      lines.push(`${action[e.eventAction] || e.eventAction}: ${e.eventDate}`)
+      lines.push(`${labels[e.eventAction] || e.eventAction}: ${e.eventDate}`)
     }
   }
 
-  // Nameservers
   const ns = data.nameservers as { ldhName: string }[] | undefined
   if (ns?.length) {
     lines.push(`Name Servers:`)
     for (const n of ns) lines.push(`  ${n.ldhName}`)
   }
 
-  // Entities (registrar, registrant)
   const entities = data.entities as { handle?: string; roles?: string[]; vcardArray?: unknown[] }[] | undefined
   if (entities) {
     for (const ent of entities) {
       const roles = ent.roles?.join(', ') || 'unknown'
       const handle = ent.handle || '-'
       lines.push(`\n[${roles}] ${handle}`)
-
-      // Try to extract vcard info
       const vcard = ent.vcardArray as [string, [string, Record<string, unknown>, string, string][]] | undefined
       if (vcard?.[1]) {
         for (const field of vcard[1]) {
           const [type, , , value] = field
           if (value && typeof value === 'string') {
-            const labels: Record<string, string> = {
-              fn: 'Name', org: 'Org', email: 'Email', 'contact-uri': 'URL',
-              tel: 'Phone', adr: 'Address',
+            const fieldLabels: Record<string, string> = {
+              fn: 'Name', org: 'Org', email: 'Email', 'contact-uri': 'URL', tel: 'Phone',
             }
-            lines.push(`  ${labels[type] || type}: ${value}`)
+            lines.push(`  ${fieldLabels[type] || type}: ${value}`)
           }
         }
       }
-    }
-  }
-
-  // Notices
-  const notices = data.notices as { title?: string; description?: string[] }[] | undefined
-  if (notices?.length) {
-    lines.push(`\n--- Notices ---`)
-    for (const n of notices) {
-      if (n.title) lines.push(`${n.title}`)
-      if (n.description) lines.push(n.description.join('\n'))
     }
   }
 
@@ -87,38 +88,13 @@ export default function WhoisLookup() {
 
       const errors: string[] = []
 
-      // RDAP protocol (IETF standard, supports CORS)
+      // RDAP protocol (IETF standard, CORS supported)
       try {
-        const tld = domain.split('.').pop()
-        const res = await fetch(`https://rdap.org/${tld}/domain/${encodeURIComponent(domain)}`)
-        if (res.ok) {
-          const data = await res.json()
-          setResult(formatRdap(data))
-          return
-        }
-        errors.push(`rdap.org: HTTP ${res.status}`)
+        const data = await fetchWithProxy(`https://rdap.org/domain/${encodeURIComponent(domain)}`)
+        setResult(formatRdap(data))
+        return
       } catch (e) {
-        errors.push(`rdap.org: ${(e as Error).message}`)
-      }
-
-      // Fallback: WHOIS JSON API with CORS proxy
-      try {
-        const apiUrl = `https://whois.freeaiapi.xyz/?name=${encodeURIComponent(domain)}`
-        const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`)
-        if (res.ok) {
-          const data = await res.json()
-          if (data.result) {
-            setResult(data.result)
-            return
-          }
-          if (data.data) {
-            setResult(typeof data.data === 'string' ? data.data : JSON.stringify(data.data, null, 2))
-            return
-          }
-        }
-        errors.push(`whois API: HTTP ${res.status}`)
-      } catch (e) {
-        errors.push(`whois API: ${(e as Error).message}`)
+        errors.push(`RDAP: ${(e as Error).message}`)
       }
 
       throw new Error(`查询失败:\n${errors.join('\n')}`)
@@ -130,7 +106,7 @@ export default function WhoisLookup() {
   }
 
   return (
-    <ToolShell title="WHOIS 查询" description="查询域名注册信息（支持 RDAP 标准协议）">
+    <ToolShell title="WHOIS 查询" description="查询域名注册信息（基于 RDAP 标准协议）">
       <Section>
         <div className="flex flex-wrap gap-3 items-end">
           <div className="flex-1 min-w-48">

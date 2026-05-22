@@ -9,6 +9,53 @@ interface IcpResult {
   siteName: string
 }
 
+async function fetchJson(url: string, ms = 10000): Promise<Record<string, unknown>> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), ms)
+  try {
+    const res = await fetch(url, { signal: controller.signal })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return await res.json()
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+async function fetchWithProxy(url: string, ms = 10000): Promise<Record<string, unknown>> {
+  try {
+    return await fetchJson(url, ms)
+  } catch {
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+    return fetchJson(proxyUrl, ms + 4000)
+  }
+}
+
+function parseIcpData(data: Record<string, unknown>, domain: string): IcpResult {
+  // Handle different API response formats
+  const info = data.info as Record<string, unknown> | undefined
+  if (info) {
+    return {
+      domain: (info.domain as string) || domain,
+      owner: (info.unitName as string) || '-',
+      type: (info.nature as string) || '-',
+      license: (info.icp as string) || '-',
+      siteName: (info.siteName as string) || '-',
+    }
+  }
+  // Alternative format
+  const d = data.data as Record<string, unknown> | undefined
+  if (d) {
+    return {
+      domain: (d.domain as string) || domain,
+      owner: (d.unitName as string) || (d.owner_name as string) || '-',
+      type: (d.nature as string) || (d.type as string) || '-',
+      license: (d.icp as string) || (d.licence as string) || '-',
+      siteName: (d.siteName as string) || (d.site_name as string) || '-',
+    }
+  }
+  throw new Error(data.msg as string || data.message as string || '未查询到备案信息')
+}
+
 export default function IcpLookup() {
   const [input, setInput] = useState('')
   const [results, setResults] = useState<IcpResult[]>([])
@@ -24,50 +71,38 @@ export default function IcpLookup() {
       if (!domain) throw new Error('请输入域名或备案号')
 
       const errors: string[] = []
-      const apiUrl = `https://api.vvhan.com/api/icp?url=${encodeURIComponent(domain)}`
 
-      // Try direct request first
+      // API 1: vvhan (direct or via proxy)
       try {
-        const res = await fetch(apiUrl)
-        if (res.ok) {
-          const data = await res.json()
-          if (data.success && data.info) {
-            setResults([{
-              domain: data.info.domain || domain,
-              owner: data.info.unitName || '-',
-              type: data.info.nature || '-',
-              license: data.info.icp || '-',
-              siteName: data.info.siteName || '-',
-            }])
-            return
-          }
-          throw new Error(data.msg || '未查询到备案信息')
+        const data = await fetchWithProxy(`https://api.vvhan.com/api/icp?url=${encodeURIComponent(domain)}`)
+        if (data.success) {
+          setResults([parseIcpData(data, domain)])
+          return
         }
-        errors.push(`直接请求: HTTP ${res.status}`)
+        errors.push(`vvhan: ${data.msg || '查询失败'}`)
       } catch (e) {
-        errors.push(`直接请求: ${(e as Error).message}`)
+        errors.push(`vvhan: ${(e as Error).message}`)
       }
 
-      // Fallback: CORS proxy
+      // API 2: icpapi (alternative, via proxy)
       try {
-        const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`)
-        if (res.ok) {
-          const data = await res.json()
-          if (data.success && data.info) {
+        const data = await fetchWithProxy(`https://icpapi.com/api/v1/icp?domain=${encodeURIComponent(domain)}`)
+        if (!data.error) {
+          const info = data.data as Record<string, unknown> | undefined
+          if (info) {
             setResults([{
-              domain: data.info.domain || domain,
-              owner: data.info.unitName || '-',
-              type: data.info.nature || '-',
-              license: data.info.icp || '-',
-              siteName: data.info.siteName || '-',
+              domain: (info.Domain as string) || domain,
+              owner: (info.Owner as string) || '-',
+              type: (info.Type as string) || '-',
+              license: (info.Licence as string) || '-',
+              siteName: (info.Name as string) || '-',
             }])
             return
           }
-          throw new Error(data.msg || '未查询到备案信息')
         }
-        errors.push(`代理请求: HTTP ${res.status}`)
+        errors.push(`icpapi: ${data.error || '查询失败'}`)
       } catch (e) {
-        errors.push(`代理请求: ${(e as Error).message}`)
+        errors.push(`icpapi: ${(e as Error).message}`)
       }
 
       throw new Error(`查询失败:\n${errors.join('\n')}`)
