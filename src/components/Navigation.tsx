@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { navCategories, type NavItem, type NavCategory } from '../navData'
 import { Search, ExternalLink, ArrowLeft, Sun, Moon, Compass } from 'lucide-react'
+import AdBanner from './AdBanner'
 
 function getFaviconUrl(url: string): string {
   try {
@@ -158,9 +159,12 @@ export default function Navigation({ dark, onToggleTheme }: NavigationProps) {
 
         {/* Categories */}
         <div>
-          {filtered.map((cat) => (
+          {filtered.map((cat, i) => (
             <div key={cat.title} id={cat.title}>
               <CategorySection category={cat} />
+              {(i + 1) % 4 === 0 && i < filtered.length - 1 && (
+                <AdBanner adSlot="NAV_INFEED_SLOT" className="mb-6" />
+              )}
             </div>
           ))}
         </div>

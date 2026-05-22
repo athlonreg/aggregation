@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, ChevronDown, Wrench, Compass, Rss } from 'lucide-react'
+import AdBanner from './AdBanner'
 
 // ── Quote fetcher (hitokoto.cn API) ─────────────────────
 function useQuote() {
@@ -364,6 +365,11 @@ export default function Home() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Ad */}
+        <div className="mb-6 max-w-xl mx-auto">
+          <AdBanner adSlot="HOME_BANNER_SLOT" />
         </div>
 
         {/* Entry buttons — single row, auto-wrap */}
