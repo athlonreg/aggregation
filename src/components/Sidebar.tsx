@@ -5,7 +5,7 @@ import {
   Replace, FileSearch, KeyRound, Sparkles, Tags, Code,
   FileCode, ArrowRightLeft, Clock, Palette,
   Regex, Timer, Divide, CalendarDays, Server, Search,
-  Ruler, Radio, Wifi, ShieldCheck, Gamepad2
+  Ruler, Radio, Wifi, ShieldCheck
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -118,12 +118,6 @@ const categories: ToolCategory[] = [
     title: '证书/安全',
     items: [
       { label: '自签证书生成', path: '/cert', icon: <ShieldCheck size={16} /> },
-    ],
-  },
-  {
-    title: '游戏工具',
-    items: [
-      { label: '存档编辑器', path: '/saveeditor', icon: <Gamepad2 size={16} /> },
     ],
   },
 ]
