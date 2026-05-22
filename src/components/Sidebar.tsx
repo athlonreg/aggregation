@@ -1,7 +1,11 @@
 import {
   Calculator, Binary, Lock, Braces, FileText, Network,
   Calendar, Hash, Fingerprint, Link, Banknote, Cpu,
-  Globe, Zap
+  Globe, Zap, Type, Diff, CaseSensitive, ListFilter,
+  Replace, FileSearch, KeyRound, Sparkles, Tags, Code,
+  FileCode, Paintbrush, ArrowRightLeft, Clock, Palette,
+  Regex, Timer, Divide, CalendarDays, Server, Search,
+  Ruler
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -27,6 +31,9 @@ const categories: ToolCategory[] = [
       { label: '进制计算器', path: '/calculator', icon: <Calculator size={16} /> },
       { label: '编码转换', path: '/encoding', icon: <Binary size={16} /> },
       { label: 'URL 编解码', path: '/url', icon: <Link size={16} /> },
+      { label: 'Base64 编解码', path: '/base64', icon: <Binary size={16} /> },
+      { label: 'Hex 编解码', path: '/hex', icon: <Hash size={16} /> },
+      { label: 'Unicode 编解码', path: '/unicode', icon: <Type size={16} /> },
     ],
   },
   {
@@ -36,10 +43,25 @@ const categories: ToolCategory[] = [
     ],
   },
   {
+    title: '文本工具',
+    items: [
+      { label: '文本对比', path: '/diff', icon: <Diff size={16} /> },
+      { label: '字符统计', path: '/charcount', icon: <FileSearch size={16} /> },
+      { label: '大小写转换', path: '/case', icon: <CaseSensitive size={16} /> },
+      { label: '文本去重', path: '/dedup', icon: <ListFilter size={16} /> },
+      { label: '文本替换', path: '/textreplace', icon: <Replace size={16} /> },
+      { label: '文本摘要', path: '/summary', icon: <FileText size={16} /> },
+    ],
+  },
+  {
     title: '格式化',
     items: [
       { label: 'JSON 格式化', path: '/json', icon: <Braces size={16} /> },
       { label: 'YAML 格式化', path: '/yaml', icon: <FileText size={16} /> },
+      { label: 'XML 格式化', path: '/xml', icon: <Code size={16} /> },
+      { label: 'SQL 格式化', path: '/sql', icon: <FileCode size={16} /> },
+      { label: 'CSS 格式化', path: '/cssformat', icon: <Paintbrush size={16} /> },
+      { label: 'HTML 格式化', path: '/htmlformat', icon: <Code size={16} /> },
     ],
   },
   {
@@ -47,6 +69,28 @@ const categories: ToolCategory[] = [
     items: [
       { label: 'UUID 生成', path: '/uuid', icon: <Hash size={16} /> },
       { label: 'GUID 生成', path: '/guid', icon: <Fingerprint size={16} /> },
+      { label: '密码生成', path: '/password', icon: <KeyRound size={16} /> },
+      { label: '哈希生成', path: '/hash', icon: <Lock size={16} /> },
+      { label: 'Lorem 生成', path: '/lorem', icon: <Sparkles size={16} /> },
+      { label: '序列号生成', path: '/serial', icon: <Tags size={16} /> },
+    ],
+  },
+  {
+    title: '转换工具',
+    items: [
+      { label: 'JSON 转换', path: '/jsonconvert', icon: <ArrowRightLeft size={16} /> },
+      { label: '时间戳转换', path: '/timestamp', icon: <Clock size={16} /> },
+      { label: '单位转换', path: '/unit', icon: <Ruler size={16} /> },
+      { label: '颜色转换', path: '/color', icon: <Palette size={16} /> },
+    ],
+  },
+  {
+    title: '计算器',
+    items: [
+      { label: '正则测试', path: '/regex', icon: <Regex size={16} /> },
+      { label: 'Cron 解析', path: '/cron', icon: <Timer size={16} /> },
+      { label: '科学计算器', path: '/scientific', icon: <Divide size={16} /> },
+      { label: '日期计算器', path: '/datecalc', icon: <CalendarDays size={16} /> },
     ],
   },
   {
@@ -54,6 +98,8 @@ const categories: ToolCategory[] = [
     items: [
       { label: '子网掩码计算', path: '/subnet', icon: <Network size={16} /> },
       { label: 'IP 查询', path: '/ip', icon: <Globe size={16} /> },
+      { label: 'HTTP 状态码', path: '/httpstatus', icon: <Server size={16} /> },
+      { label: '端口查询', path: '/port', icon: <Search size={16} /> },
     ],
   },
   {
