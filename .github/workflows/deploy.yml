@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
 on:
   push:
@@ -9,10 +9,6 @@ permissions:
   contents: read
   pages: write
   id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -29,8 +25,12 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cf-pages
+          path: dist
 
-  deploy:
+  deploy-github:
     needs: build
     runs-on: ubuntu-latest
     environment:
@@ -39,3 +39,17 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  deploy-cloudflare:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: cf-pages
+          path: dist
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=devtoolbox
