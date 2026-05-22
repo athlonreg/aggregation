@@ -3,9 +3,9 @@ import {
   Calendar, Hash, Fingerprint, Link, Banknote, Cpu,
   Globe, Zap, Type, Diff, CaseSensitive, ListFilter,
   Replace, FileSearch, KeyRound, Sparkles, Tags, Code,
-  FileCode, Paintbrush, ArrowRightLeft, Clock, Palette,
+  FileCode, ArrowRightLeft, Clock, Palette,
   Regex, Timer, Divide, CalendarDays, Server, Search,
-  Ruler
+  Ruler, Radio, Wifi, ShieldCheck, Gamepad2
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -60,8 +60,7 @@ const categories: ToolCategory[] = [
       { label: 'YAML 格式化', path: '/yaml', icon: <FileText size={16} /> },
       { label: 'XML 格式化', path: '/xml', icon: <Code size={16} /> },
       { label: 'SQL 格式化', path: '/sql', icon: <FileCode size={16} /> },
-      { label: 'CSS 格式化', path: '/cssformat', icon: <Paintbrush size={16} /> },
-      { label: 'HTML 格式化', path: '/htmlformat', icon: <Code size={16} /> },
+      { label: '代码格式化', path: '/codeformat', icon: <FileCode size={16} /> },
     ],
   },
   {
@@ -90,6 +89,7 @@ const categories: ToolCategory[] = [
       { label: '正则测试', path: '/regex', icon: <Regex size={16} /> },
       { label: 'Cron 解析', path: '/cron', icon: <Timer size={16} /> },
       { label: '科学计算器', path: '/scientific', icon: <Divide size={16} /> },
+      { label: '程序员计算器', path: '/programmer', icon: <Binary size={16} /> },
       { label: '日期计算器', path: '/datecalc', icon: <CalendarDays size={16} /> },
     ],
   },
@@ -100,6 +100,9 @@ const categories: ToolCategory[] = [
       { label: 'IP 查询', path: '/ip', icon: <Globe size={16} /> },
       { label: 'HTTP 状态码', path: '/httpstatus', icon: <Server size={16} /> },
       { label: '端口查询', path: '/port', icon: <Search size={16} /> },
+      { label: 'MQTT 客户端', path: '/mqtt', icon: <Radio size={16} /> },
+      { label: 'WebSocket 测试', path: '/websocket', icon: <Wifi size={16} /> },
+      { label: '服务器测试', path: '/servertest', icon: <Server size={16} /> },
     ],
   },
   {
@@ -109,6 +112,18 @@ const categories: ToolCategory[] = [
       { label: '人民币大写', path: '/rmb', icon: <Banknote size={16} /> },
       { label: 'ARM HEX 转换', path: '/armhex', icon: <Cpu size={16} /> },
       { label: 'API 测试', path: '/api', icon: <Zap size={16} /> },
+    ],
+  },
+  {
+    title: '证书/安全',
+    items: [
+      { label: '自签证书生成', path: '/cert', icon: <ShieldCheck size={16} /> },
+    ],
+  },
+  {
+    title: '游戏工具',
+    items: [
+      { label: '存档编辑器', path: '/saveeditor', icon: <Gamepad2 size={16} /> },
     ],
   },
 ]

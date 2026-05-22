@@ -42,8 +42,7 @@ const SerialGen = lazy(() => import('./tools/SerialGen'))
 // Formatters
 const XmlFormatter = lazy(() => import('./tools/XmlFormatter'))
 const SqlFormatter = lazy(() => import('./tools/SqlFormatter'))
-const CssFormatter = lazy(() => import('./tools/CssFormatter'))
-const HtmlFormatter = lazy(() => import('./tools/HtmlFormatter'))
+const CodeFormatter = lazy(() => import('./tools/CodeFormatter'))
 
 // Converters
 const JsonConvert = lazy(() => import('./tools/JsonConvert'))
@@ -55,11 +54,17 @@ const ColorConvert = lazy(() => import('./tools/ColorConvert'))
 const RegexTester = lazy(() => import('./tools/RegexTester'))
 const CronParser = lazy(() => import('./tools/CronParser'))
 const ScientificCalc = lazy(() => import('./tools/ScientificCalc'))
+const ProgrammerCalc = lazy(() => import('./tools/ProgrammerCalc'))
 const DateCalc = lazy(() => import('./tools/DateCalc'))
 
 // Network tools
 const HttpStatus = lazy(() => import('./tools/HttpStatus'))
 const PortLookup = lazy(() => import('./tools/PortLookup'))
+const MqttClient = lazy(() => import('./tools/MqttClient'))
+const WebSocketTester = lazy(() => import('./tools/WebSocketTester'))
+const ServerTest = lazy(() => import('./tools/ServerTest'))
+const SelfSignedCert = lazy(() => import('./tools/SelfSignedCert'))
+const SaveEditor = lazy(() => import('./tools/SaveEditor'))
 
 function Loading() {
   return <div className="flex items-center justify-center py-12 text-gray-400 text-sm">加载中...</div>
@@ -97,8 +102,7 @@ const routeTitles: Record<string, string> = {
   '/serial': '序列号生成',
   '/xml': 'XML 格式化',
   '/sql': 'SQL 格式化',
-  '/cssformat': 'CSS 格式化',
-  '/htmlformat': 'HTML 格式化',
+  '/codeformat': '代码格式化',
   '/jsonconvert': 'JSON 转换',
   '/timestamp': '时间戳转换',
   '/unit': '单位转换',
@@ -106,9 +110,15 @@ const routeTitles: Record<string, string> = {
   '/regex': '正则测试',
   '/cron': 'Cron 解析',
   '/scientific': '科学计算器',
+  '/programmer': '程序员计算器',
   '/datecalc': '日期计算器',
   '/httpstatus': 'HTTP 状态码',
   '/port': '端口查询',
+  '/mqtt': 'MQTT 客户端',
+  '/websocket': 'WebSocket 测试',
+  '/servertest': '服务器测试',
+  '/cert': '自签证书生成',
+  '/saveeditor': '存档编辑器',
 }
 
 export default function App() {
@@ -183,8 +193,7 @@ export default function App() {
           {/* Formatters */}
           <Route path="/xml" element={<XmlFormatter />} />
           <Route path="/sql" element={<SqlFormatter />} />
-          <Route path="/cssformat" element={<CssFormatter />} />
-          <Route path="/htmlformat" element={<HtmlFormatter />} />
+          <Route path="/codeformat" element={<CodeFormatter />} />
 
           {/* Converters */}
           <Route path="/jsonconvert" element={<JsonConvert />} />
@@ -196,11 +205,17 @@ export default function App() {
           <Route path="/regex" element={<RegexTester />} />
           <Route path="/cron" element={<CronParser />} />
           <Route path="/scientific" element={<ScientificCalc />} />
+          <Route path="/programmer" element={<ProgrammerCalc />} />
           <Route path="/datecalc" element={<DateCalc />} />
 
           {/* Network */}
           <Route path="/httpstatus" element={<HttpStatus />} />
           <Route path="/port" element={<PortLookup />} />
+          <Route path="/mqtt" element={<MqttClient />} />
+          <Route path="/websocket" element={<WebSocketTester />} />
+          <Route path="/servertest" element={<ServerTest />} />
+          <Route path="/cert" element={<SelfSignedCert />} />
+          <Route path="/saveeditor" element={<SaveEditor />} />
         </Routes>
       </Suspense>
     </Layout>
