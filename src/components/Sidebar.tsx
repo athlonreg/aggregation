@@ -1,7 +1,7 @@
 import {
   Calculator, Binary, Lock, Braces, FileText, Network,
   Calendar, Hash, Fingerprint, Link, Banknote, Cpu,
-  Globe, Search, Shield, Zap
+  Globe, Zap
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -54,8 +54,6 @@ const categories: ToolCategory[] = [
     items: [
       { label: '子网掩码计算', path: '/subnet', icon: <Network size={16} /> },
       { label: 'IP 查询', path: '/ip', icon: <Globe size={16} /> },
-      { label: 'WHOIS 查询', path: '/whois', icon: <Search size={16} /> },
-      { label: '网站备案查询', path: '/icp', icon: <Shield size={16} /> },
     ],
   },
   {

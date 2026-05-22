@@ -16,8 +16,6 @@ import UrlCodec from './tools/UrlCodec'
 import RmbConvert from './tools/RmbConvert'
 import ArmHex from './tools/ArmHex'
 import IpLookup from './tools/IpLookup'
-import WhoisLookup from './tools/WhoisLookup'
-import IcpLookup from './tools/IcpLookup'
 import ApiTester from './tools/ApiTester'
 
 export default function App() {
@@ -51,8 +49,6 @@ export default function App() {
     '/rmb': '人民币大写',
     '/armhex': 'ARM HEX 转换',
     '/ip': 'IP 查询',
-    '/whois': 'WHOIS 查询',
-    '/icp': '网站备案查询',
     '/api': 'API 测试',
   }
 
@@ -87,8 +83,6 @@ export default function App() {
         <Route path="/rmb" element={<RmbConvert />} />
         <Route path="/armhex" element={<ArmHex />} />
         <Route path="/ip" element={<IpLookup />} />
-        <Route path="/whois" element={<WhoisLookup />} />
-        <Route path="/icp" element={<IcpLookup />} />
         <Route path="/api" element={<ApiTester />} />
       </Routes>
     </Layout>
