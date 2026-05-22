@@ -163,7 +163,7 @@ export default function Navigation({ dark, onToggleTheme }: NavigationProps) {
             <div key={cat.title} id={cat.title}>
               <CategorySection category={cat} />
               {(i + 1) % 4 === 0 && i < filtered.length - 1 && (
-                <AdBanner adSlot="NAV_INFEED_SLOT" className="mb-6" />
+                <AdBanner adSlot="5991597812" className="mb-6" />
               )}
             </div>
           ))}

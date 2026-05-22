@@ -369,7 +369,7 @@ export default function Home() {
 
         {/* Ad */}
         <div className="mb-6 max-w-xl mx-auto">
-          <AdBanner adSlot="HOME_BANNER_SLOT" />
+          <AdBanner adSlot="7464461589" />
         </div>
 
         {/* Entry buttons — single row, auto-wrap */}
