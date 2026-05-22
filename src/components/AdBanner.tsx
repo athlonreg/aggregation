@@ -4,6 +4,9 @@ declare global {
   interface Window { adsbygoogle: unknown[] }
 }
 
+// Set to true to enable AdSense ads
+const ADS_ENABLED = false
+
 interface AdBannerProps {
   adSlot: string
   className?: string
@@ -15,24 +18,14 @@ export default function AdBanner({ adSlot, className = '', style }: AdBannerProp
   const pushed = useRef(false)
 
   useEffect(() => {
-    if (pushed.current) return
+    if (!ADS_ENABLED || pushed.current) return
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({})
       pushed.current = true
     } catch {}
   }, [])
 
-  // Dev environment: show placeholder instead of real ad
-  if (import.meta.env.DEV) {
-    return (
-      <div
-        className={`flex items-center justify-center bg-gray-100 dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-gray-400 dark:text-gray-600 text-xs ${className}`}
-        style={{ minHeight: 90, ...style }}
-      >
-        Ad Placeholder ({adSlot})
-      </div>
-    )
-  }
+  if (!ADS_ENABLED) return null
 
   return (
     <div className={`text-center overflow-hidden ${className}`}>
