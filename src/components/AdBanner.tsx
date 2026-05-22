@@ -5,7 +5,7 @@ declare global {
 }
 
 // Set to true to enable AdSense ads
-const ADS_ENABLED = false
+const ADS_ENABLED = true
 
 interface AdBannerProps {
   adSlot: string
