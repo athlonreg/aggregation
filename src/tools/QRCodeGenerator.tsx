@@ -51,9 +51,13 @@ function downloadDataUrl(dataUrl: string, filename: string) {
 
 // ── Generate QR data string ─────────────────────────────────────
 
-function buildQrString(mode: QrMode, fields: Record<string, string>): string {
+function buildQrString(mode: QrMode, fields: Record<string, string>, useSafeRedirect: boolean): string {
   switch (mode) {
-    case 'url': return fields.url || ''
+    case 'url': {
+      const url = fields.url || ''
+      if (!url) return ''
+      return useSafeRedirect ? `${window.location.origin}/redirect?url=${encodeURIComponent(url)}` : url
+    }
     case 'wifi': return `WIFI:T:${fields.security || 'WPA'};S:${fields.ssid || ''};P:${fields.password || ''};H:${fields.hidden === 'true' ? 'true' : 'false'};;`
     case 'vcard':
       return [
@@ -117,6 +121,7 @@ function QRTab() {
   const [logoPreview, setLogoPreview] = useState<string>('')
   const [preview, setPreview] = useState<string>('')
   const [generating, setGenerating] = useState(false)
+  const [useSafeRedirect, setUseSafeRedirect] = useState(true)
   const logoInputRef = useRef<HTMLInputElement>(null)
 
   const setField = useCallback((k: string, v: string) => setFields(prev => ({ ...prev, [k]: v })), [])
@@ -132,7 +137,7 @@ function QRTab() {
   }, [])
 
   const handleGenerate = useCallback(async () => {
-    const text = buildQrString(mode, fields)
+    const text = buildQrString(mode, fields, useSafeRedirect)
     if (!text.trim()) return
     setGenerating(true)
     try {
@@ -143,7 +148,7 @@ function QRTab() {
   }, [mode, fields, logoFile])
 
   const handleDownload = useCallback(async (size: number) => {
-    const text = buildQrString(mode, fields)
+    const text = buildQrString(mode, fields, useSafeRedirect)
     if (!text.trim()) return
     const canvas = await qrToCanvas(text, size, logoFile)
     downloadDataUrl(canvas.toDataURL('image/png'), `qrcode_${size}x${size}.png`)
@@ -158,9 +163,15 @@ function QRTab() {
       </div>
 
       {mode === 'url' && (
-        <div className="mb-3">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">URL 地址</label>
-          <input value={fields.url} onChange={e => setField('url', e.target.value)} placeholder="https://example.com" className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100" />
+        <div className="mb-3 space-y-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">URL 地址</label>
+            <input value={fields.url} onChange={e => setField('url', e.target.value)} placeholder="https://example.com" className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100" />
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={useSafeRedirect} onChange={e => setUseSafeRedirect(e.target.checked)} className="rounded border-gray-300 dark:border-gray-700" />
+            <span className="text-sm text-gray-600 dark:text-gray-400">安全跳转（扫码后先提示目标地址）</span>
+          </label>
         </div>
       )}
 

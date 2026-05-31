@@ -66,6 +66,7 @@ const ServerTest = lazy(() => import('./tools/ServerTest'))
 const SelfSignedCert = lazy(() => import('./tools/SelfSignedCert'))
 const ImageConverter = lazy(() => import('./tools/ImageConverter'))
 const QRCodeGenerator = lazy(() => import('./tools/QRCodeGenerator'))
+const RedirectPage = lazy(() => import('./tools/RedirectPage'))
 
 function Loading() {
   return <div className="flex items-center justify-center py-12 text-gray-400 text-sm">加载中...</div>
@@ -121,6 +122,7 @@ const routeTitles: Record<string, string> = {
   '/cert': '自签证书生成',
   '/imageconvert': '图片转换',
   '/qrcode': '二维码 & 条码生成',
+  '/redirect': '安全跳转',
 }
 
 export default function App() {
@@ -144,12 +146,13 @@ export default function App() {
   }, [location.pathname])
 
   // Standalone pages: no sidebar/topbar
-  if (isHome || location.pathname === '/nav') {
+  if (isHome || location.pathname === '/nav' || location.pathname === '/redirect') {
     return (
-      <>
+      <Suspense fallback={<Loading />}>
         {isHome && <Home />}
         {location.pathname === '/nav' && <Navigation dark={dark} onToggleTheme={() => setDark(d => !d)} />}
-      </>
+        {location.pathname === '/redirect' && <RedirectPage />}
+      </Suspense>
     )
   }
 
