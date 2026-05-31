@@ -19,19 +19,38 @@ interface FileItem {
   id: number
   file: File
   preview?: string
+  isHeic?: boolean
 }
 
 let fileId = 0
 
+function isHeicFile(f: File): boolean {
+  const name = f.name.toLowerCase()
+  return name.endsWith('.heic') || name.endsWith('.heif') || f.type === 'image/heic' || f.type === 'image/heif'
+}
+
 function useFileList() {
   const [files, setFiles] = useState<FileItem[]>([])
   const addFiles = useCallback((newFiles: FileList | File[]) => {
-    const items: FileItem[] = Array.from(newFiles).map(f => ({
-      id: ++fileId,
-      file: f,
-      preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : undefined,
-    }))
+    const items: FileItem[] = Array.from(newFiles).map(f => {
+      const heic = isHeicFile(f)
+      return {
+        id: ++fileId,
+        file: f,
+        isHeic: heic,
+        preview: heic ? undefined : (f.type.startsWith('image/') ? URL.createObjectURL(f) : undefined),
+      }
+    })
     setFiles(prev => [...prev, ...items])
+    // Generate HEIC previews asynchronously
+    items.filter(i => i.isHeic).forEach(async item => {
+      try {
+        const blob = await heic2any({ blob: item.file, toType: 'image/jpeg', quality: 0.3 })
+        const result = Array.isArray(blob) ? blob[0] : blob as Blob
+        const url = URL.createObjectURL(result)
+        setFiles(prev => prev.map(f => f.id === item.id ? { ...f, preview: url } : f))
+      } catch { /* preview failed, ignore */ }
+    })
   }, [])
   const removeFile = useCallback((id: number) => {
     setFiles(prev => {
@@ -165,7 +184,7 @@ function ImgToPdf() {
 
   return (
     <>
-      <DropZone onDrop={addFiles} accept="image/*" />
+      <DropZone onDrop={addFiles} accept="image/*,.heic,.HEIC,.heif,.HEIF" />
       <FileList files={files} onRemove={removeFile} />
       <div className="flex items-center gap-3 mt-3">
         <ActionButton onClick={handleConvert} disabled={!files.length || processing}>
@@ -331,7 +350,7 @@ function ImgCompress() {
 
   return (
     <>
-      <DropZone onDrop={addFiles} accept="image/*" />
+      <DropZone onDrop={addFiles} accept="image/*,.heic,.HEIC,.heif,.HEIF" />
       <FileList files={files} onRemove={removeFile} />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
         <div>
@@ -382,12 +401,25 @@ function ImgCompress() {
 
 // ── Helpers ──────────────────────────────────────────────────────
 
+async function loadAsBlob(file: File): Promise<Blob> {
+  if (isHeicFile(file)) {
+    const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 })
+    return Array.isArray(blob) ? blob[0] : blob as Blob
+  }
+  return file
+}
+
 function loadImage(file: File): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = () => reject(new Error('无法加载图片'))
-    img.src = URL.createObjectURL(file)
+  return new Promise(async (resolve, reject) => {
+    try {
+      const blob = await loadAsBlob(file)
+      const img = new Image()
+      img.onload = () => resolve(img)
+      img.onerror = () => reject(new Error('无法加载图片'))
+      img.src = URL.createObjectURL(blob)
+    } catch (err) {
+      reject(err)
+    }
   })
 }
 
