@@ -1,9 +1,12 @@
-import { useSearchParams } from 'react-router-dom'
 import { ExternalLink, ShieldAlert } from 'lucide-react'
 
+function getTargetUrl(): string {
+  const params = new URLSearchParams(window.location.search)
+  return params.get('url') || ''
+}
+
 export default function RedirectPage() {
-  const [params] = useSearchParams()
-  const targetUrl = params.get('url') || ''
+  const targetUrl = getTargetUrl()
 
   if (!targetUrl) {
     return (
