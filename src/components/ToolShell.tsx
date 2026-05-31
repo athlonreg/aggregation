@@ -17,7 +17,6 @@ export default function ToolShell({ title, description, children }: ToolShellPro
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>
         )}
       </div>
-      <AdBanner adSlot="9930842822" className="mb-4" />
       <div className="space-y-4">{children}</div>
       <AdBanner adSlot="7667641569" className="mt-4" />
     </div>
