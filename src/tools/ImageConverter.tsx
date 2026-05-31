@@ -4,6 +4,7 @@ import { Upload, Download, Trash2, Loader2, FileImage, FileText, Minimize2 } fro
 import heic2any from 'heic2any'
 import { jsPDF } from 'jspdf'
 import { PDFDocument } from 'pdf-lib'
+import JSZip from 'jszip'
 
 type Tab = 'heic2jpg' | 'img2pdf' | 'webp2png' | 'pdf' | 'compress'
 
@@ -344,9 +345,16 @@ function ImgCompress() {
     downloadBlob(r.blob, r.name.replace(/\.\w+$/, '') + '_compressed' + ext)
   }, [outputType])
 
-  const downloadAll = useCallback(() => {
-    results.forEach(r => downloadResult(r))
-  }, [results, downloadResult])
+  const downloadAll = useCallback(async () => {
+    const ext = outputType === 'image/png' ? '.png' : outputType === 'image/webp' ? '.webp' : '.jpg'
+    const zip = new JSZip()
+    for (const r of results) {
+      const name = r.name.replace(/\.\w+$/, '') + '_compressed' + ext
+      zip.file(name, r.blob)
+    }
+    const out = await zip.generateAsync({ type: 'blob' })
+    downloadBlob(out, 'compressed_images.zip')
+  }, [results, outputType])
 
   return (
     <>
