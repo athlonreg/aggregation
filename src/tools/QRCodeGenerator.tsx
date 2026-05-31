@@ -23,13 +23,13 @@ const QR_MODES: { id: QrMode; label: string }[] = [
 ]
 
 const BARCODE_TYPES = [
-  { value: 'CODE128', label: 'CODE128' },
-  { value: 'CODE39', label: 'CODE39' },
-  { value: 'EAN13', label: 'EAN-13' },
-  { value: 'EAN8', label: 'EAN-8' },
-  { value: 'UPC', label: 'UPC-A' },
-  { value: 'ITF14', label: 'ITF-14' },
-  { value: 'pharmacode', label: 'Pharmacode' },
+  { value: 'CODE128', label: 'CODE128', hint: '任意文本或数字', validate: (v: string) => v.length > 0 },
+  { value: 'CODE39', label: 'CODE39', hint: '大写字母、数字和部分符号', validate: (v: string) => /^[A-Z0-9\-. $/+%]+$/.test(v) },
+  { value: 'EAN13', label: 'EAN-13', hint: '12 或 13 位数字', validate: (v: string) => /^\d{12,13}$/.test(v) },
+  { value: 'EAN8', label: 'EAN-8', hint: '7 或 8 位数字', validate: (v: string) => /^\d{7,8}$/.test(v) },
+  { value: 'UPC', label: 'UPC-A', hint: '11 或 12 位数字', validate: (v: string) => /^\d{11,12}$/.test(v) },
+  { value: 'ITF14', label: 'ITF-14', hint: '13 或 14 位数字', validate: (v: string) => /^\d{13,14}$/.test(v) },
+  { value: 'pharmacode', label: 'Pharmacode', hint: '3-130000 之间的数字', validate: (v: string) => /^\d+$/.test(v) && Number(v) >= 3 && Number(v) <= 130000 },
 ]
 
 const DOWNLOAD_SIZES = [
@@ -284,14 +284,20 @@ function BarcodeTab() {
   const [barcodePreview, setBarcodePreview] = useState('')
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
+  const currentType = BARCODE_TYPES.find(t => t.value === barcodeType)!
+
   const handleGenerate = useCallback(() => {
     if (!barcodeText.trim()) return
+    if (!currentType.validate(barcodeText.trim())) {
+      alert('输入格式不正确：' + currentType.hint)
+      return
+    }
     try {
       const canvas = canvasRef.current!
-      JsBarcode(canvas, barcodeText, { format: barcodeType, width: 2, height: 100, displayValue: true, fontSize: 14, margin: 10 })
+      JsBarcode(canvas, barcodeText.trim(), { format: barcodeType, width: 2, height: 100, displayValue: true, fontSize: 14, margin: 10 })
       setBarcodePreview(canvas.toDataURL('image/png'))
-    } catch (err) { alert('生成失败: ' + (err as Error).message) }
-  }, [barcodeType, barcodeText])
+    } catch (err) { alert('生成失败: ' + String(err)) }
+  }, [barcodeType, barcodeText, currentType])
 
   const handleDownload = useCallback((size: number) => {
     if (!barcodePreview) return
@@ -320,7 +326,8 @@ function BarcodeTab() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">内容</label>
-          <input value={barcodeText} onChange={e => setBarcodeText(e.target.value)} placeholder={barcodeType === 'EAN13' ? '1234567890128' : '输入内容'} className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100" />
+          <input value={barcodeText} onChange={e => setBarcodeText(e.target.value)} placeholder={currentType.hint} className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100" />
+          <div className="text-xs text-gray-400 mt-1">{currentType.hint}</div>
         </div>
       </div>
 
