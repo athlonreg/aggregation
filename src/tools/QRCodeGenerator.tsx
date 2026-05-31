@@ -56,7 +56,7 @@ function buildQrString(mode: QrMode, fields: Record<string, string>, useSafeRedi
     case 'url': {
       const url = fields.url || ''
       if (!url) return ''
-      return useSafeRedirect ? `${window.location.origin}/redirect?url=${encodeURIComponent(url)}` : url
+      return useSafeRedirect ? `https://www.tlhub.cn/redirect#${encodeURIComponent(url)}` : url
     }
     case 'wifi': return `WIFI:T:${fields.security || 'WPA'};S:${fields.ssid || ''};P:${fields.password || ''};H:${fields.hidden === 'true' ? 'true' : 'false'};;`
     case 'vcard':

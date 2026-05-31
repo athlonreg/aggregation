@@ -1,8 +1,8 @@
 import { ExternalLink, ShieldAlert } from 'lucide-react'
 
 function getTargetUrl(): string {
-  const params = new URLSearchParams(window.location.search)
-  return params.get('url') || ''
+  const hash = window.location.hash.slice(1) // remove leading #
+  return hash ? decodeURIComponent(hash) : ''
 }
 
 export default function RedirectPage() {
