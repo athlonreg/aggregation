@@ -72,57 +72,58 @@ function Loading() {
   return <div className="flex items-center justify-center py-12 text-gray-400 text-sm">加载中...</div>
 }
 
-const routeTitles: Record<string, string> = {
-  '/': '套陆聚合站',
-  '/nav': '精选导航',
-  '/calculator': '进制计算器',
-  '/encoding': '编码转换',
-  '/crypto': '哈希 / 加解密',
-  '/json': 'JSON 格式化',
-  '/yaml': 'YAML 格式化',
-  '/subnet': '子网掩码计算',
-  '/datetime': '日期时间',
-  '/uuid': 'UUID 生成',
-  '/guid': 'GUID 生成',
-  '/url': 'URL 编解码',
-  '/rmb': '人民币大写',
-  '/armhex': 'ARM HEX 转换',
-  '/ip': 'IP 查询',
-  '/api': 'API 测试',
-  '/base64': 'Base64 编解码',
-  '/hex': 'Hex 编解码',
-  '/unicode': 'Unicode 编解码',
-  '/diff': '文本对比',
-  '/charcount': '字符统计',
-  '/case': '大小写转换',
-  '/dedup': '文本去重',
-  '/textreplace': '文本替换',
-  '/summary': '文本摘要',
-  '/password': '密码生成',
-  '/hash': '哈希生成',
-  '/lorem': 'Lorem 生成',
-  '/serial': '序列号生成',
-  '/xml': 'XML 格式化',
-  '/sql': 'SQL 格式化',
-  '/codeformat': '代码格式化',
-  '/jsonconvert': 'JSON 转换',
-  '/timestamp': '时间戳转换',
-  '/unit': '单位转换',
-  '/color': '颜色转换',
-  '/regex': '正则测试',
-  '/cron': 'Cron 解析',
-  '/scientific': '科学计算器',
-  '/programmer': '程序员计算器',
-  '/datecalc': '日期计算器',
-  '/httpstatus': 'HTTP 状态码',
-  '/port': '端口查询',
-  '/mqtt': 'MQTT 客户端',
-  '/websocket': 'WebSocket 测试',
-  '/servertest': '服务器测试',
-  '/cert': '自签证书生成',
-  '/imageconvert': '图片转换',
-  '/qrcode': '二维码 & 条码生成',
-  '/redirect': '安全跳转',
+const SITE = '套陆聚合站'
+
+const routeMeta: Record<string, { title: string; desc: string }> = {
+  '/': { title: SITE, desc: '免费在线开发工具箱，40+ 开发者常用工具' },
+  '/nav': { title: '精选导航', desc: '精选开发者常用网站和资源导航' },
+  '/calculator': { title: '进制计算器', desc: '在线进制转换计算器，支持二进制、八进制、十进制、十六进制互转' },
+  '/encoding': { title: '编码转换', desc: '在线编码转换工具，支持 ASCII、UTF-8、GBK 等多种编码' },
+  '/crypto': { title: '哈希 / 加解密', desc: '在线哈希计算和加解密工具，支持 MD5、SHA、AES、DES 等' },
+  '/json': { title: 'JSON 格式化', desc: '在线 JSON 格式化、压缩、校验工具，支持 JSON 转 YAML' },
+  '/yaml': { title: 'YAML 格式化', desc: '在线 YAML 格式化和校验工具' },
+  '/subnet': { title: '子网掩码计算', desc: '在线子网掩码计算器，支持 CIDR 表示法' },
+  '/datetime': { title: '日期时间', desc: '在线日期时间工具，时区转换、日期格式化' },
+  '/uuid': { title: 'UUID 生成', desc: '在线 UUID v4 随机生成器' },
+  '/guid': { title: 'GUID 生成', desc: '在线 GUID 生成器' },
+  '/url': { title: 'URL 编解码', desc: '在线 URL 编码解码工具，支持 encodeURIComponent' },
+  '/rmb': { title: '人民币大写', desc: '在线人民币金额大写转换工具' },
+  '/armhex': { title: 'ARM HEX 转换', desc: 'ARM HEX 文件格式转换工具' },
+  '/ip': { title: 'IP 查询', desc: '在线 IP 地址查询，查看本机 IP 和归属地' },
+  '/api': { title: 'API 测试', desc: '在线 API 接口测试工具，支持 GET/POST/PUT/DELETE' },
+  '/base64': { title: 'Base64 编解码', desc: '在线 Base64 编码解码工具，支持文本和图片' },
+  '/hex': { title: 'Hex 编解码', desc: '在线十六进制编解码工具' },
+  '/unicode': { title: 'Unicode 编解码', desc: '在线 Unicode 编码解码工具' },
+  '/diff': { title: '文本对比', desc: '在线文本对比工具，高亮显示差异内容' },
+  '/charcount': { title: '字符统计', desc: '在线字符统计工具，统计字数、行数、字符数' },
+  '/case': { title: '大小写转换', desc: '在线英文大小写转换工具' },
+  '/dedup': { title: '文本去重', desc: '在线文本去重工具，去除重复行' },
+  '/textreplace': { title: '文本替换', desc: '在线文本批量替换工具，支持正则表达式' },
+  '/summary': { title: '文本摘要', desc: '在线文本摘要提取工具' },
+  '/password': { title: '密码生成', desc: '在线随机密码生成器，支持自定义长度和字符类型' },
+  '/hash': { title: '哈希生成', desc: '在线哈希生成工具，支持 MD5、SHA-1、SHA-256、SHA-512' },
+  '/lorem': { title: 'Lorem 生成', desc: '在线 Lorem Ipsum 占位文本生成器' },
+  '/serial': { title: '序列号生成', desc: '在线序列号批量生成工具' },
+  '/xml': { title: 'XML 格式化', desc: '在线 XML 格式化、压缩、校验工具' },
+  '/sql': { title: 'SQL 格式化', desc: '在线 SQL 语句格式化美化工具' },
+  '/codeformat': { title: '代码格式化', desc: '在线代码格式化工具，支持 JS/TS/Python/Go/C/Lua/SQL' },
+  '/jsonconvert': { title: 'JSON 转换', desc: '在线 JSON 转换工具，JSON 转 CSV/XML/YAML' },
+  '/timestamp': { title: '时间戳转换', desc: '在线 Unix 时间戳转换工具，秒和毫秒互转' },
+  '/unit': { title: '单位转换', desc: '在线单位换算工具，长度、重量、温度、面积等' },
+  '/color': { title: '颜色转换', desc: '在线颜色转换工具，HEX/RGB/HSL 互转，颜色选择器' },
+  '/regex': { title: '正则测试', desc: '在线正则表达式测试工具，实时匹配高亮' },
+  '/cron': { title: 'Cron 解析', desc: '在线 Cron 表达式解析工具，查看下次执行时间' },
+  '/scientific': { title: '科学计算器', desc: '在线科学计算器，支持三角函数、对数、幂运算' },
+  '/programmer': { title: '程序员计算器', desc: '在线程序员计算器，支持位运算和进制转换' },
+  '/datecalc': { title: '日期计算器', desc: '在线日期计算器，计算两个日期之间的天数' },
+  '/httpstatus': { title: 'HTTP 状态码', desc: 'HTTP 状态码速查表，200/301/404/500 等含义' },
+  '/port': { title: '端口查询', desc: '常用网络端口号查询表' },
+  '/mqtt': { title: 'MQTT 客户端', desc: '在线 MQTT 客户端测试工具' },
+  '/websocket': { title: 'WebSocket 测试', desc: '在线 WebSocket 连接测试工具' },
+  '/servertest': { title: '服务器测试', desc: '在线服务器连通性测试工具' },
+  '/cert': { title: '自签证书生成', desc: '在线自签名 SSL/TLS 证书生成工具' },
+  '/imageconvert': { title: '图片转换', desc: '在线图片格式转换工具，HEIC 转 JPG、WebP 转 PNG、图片压缩、PDF 拆分合并' },
+  '/qrcode': { title: '二维码 & 条码生成', desc: '在线二维码和条码生成器，支持 URL、Wi-Fi、vCard，可带 Logo，批量生成' },
 }
 
 export default function App() {
@@ -141,8 +142,12 @@ export default function App() {
   }, [dark])
 
   useEffect(() => {
-    const title = routeTitles[location.pathname] || '套陆聚合站'
-    document.title = title
+    const meta = routeMeta[location.pathname]
+    const title = meta?.title || SITE
+    const desc = meta?.desc || ''
+    document.title = location.pathname === '/' ? title : `${title} - ${SITE}`
+    const descEl = document.querySelector('meta[name="description"]')
+    if (descEl && desc) descEl.setAttribute('content', desc)
   }, [location.pathname])
 
   // Standalone pages: no sidebar/topbar
