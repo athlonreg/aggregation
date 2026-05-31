@@ -5,7 +5,7 @@ import {
   Replace, FileSearch, KeyRound, Sparkles, Tags, Code,
   FileCode, ArrowRightLeft, Clock, Palette,
   Regex, Timer, Divide, CalendarDays, Server, Search,
-  Ruler, Radio, Wifi, ShieldCheck, Image
+  Ruler, Radio, Wifi, ShieldCheck, Image, QrCode
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -72,6 +72,7 @@ const categories: ToolCategory[] = [
       { label: '哈希生成', path: '/hash', icon: <Lock size={16} /> },
       { label: 'Lorem 生成', path: '/lorem', icon: <Sparkles size={16} /> },
       { label: '序列号生成', path: '/serial', icon: <Tags size={16} /> },
+      { label: '二维码 & 条码', path: '/qrcode', icon: <QrCode size={16} /> },
     ],
   },
   {
