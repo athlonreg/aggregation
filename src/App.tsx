@@ -64,6 +64,7 @@ const MqttClient = lazy(() => import('./tools/MqttClient'))
 const WebSocketTester = lazy(() => import('./tools/WebSocketTester'))
 const ServerTest = lazy(() => import('./tools/ServerTest'))
 const SelfSignedCert = lazy(() => import('./tools/SelfSignedCert'))
+const ImageConverter = lazy(() => import('./tools/ImageConverter'))
 
 function Loading() {
   return <div className="flex items-center justify-center py-12 text-gray-400 text-sm">加载中...</div>
@@ -117,6 +118,7 @@ const routeTitles: Record<string, string> = {
   '/websocket': 'WebSocket 测试',
   '/servertest': '服务器测试',
   '/cert': '自签证书生成',
+  '/imageconvert': '图片转换',
 }
 
 export default function App() {
@@ -213,6 +215,7 @@ export default function App() {
           <Route path="/websocket" element={<WebSocketTester />} />
           <Route path="/servertest" element={<ServerTest />} />
           <Route path="/cert" element={<SelfSignedCert />} />
+          <Route path="/imageconvert" element={<ImageConverter />} />
         </Routes>
       </Suspense>
     </Layout>

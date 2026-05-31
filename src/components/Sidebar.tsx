@@ -5,7 +5,7 @@ import {
   Replace, FileSearch, KeyRound, Sparkles, Tags, Code,
   FileCode, ArrowRightLeft, Clock, Palette,
   Regex, Timer, Divide, CalendarDays, Server, Search,
-  Ruler, Radio, Wifi, ShieldCheck
+  Ruler, Radio, Wifi, ShieldCheck, Image
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -81,6 +81,7 @@ const categories: ToolCategory[] = [
       { label: '时间戳转换', path: '/timestamp', icon: <Clock size={16} /> },
       { label: '单位转换', path: '/unit', icon: <Ruler size={16} /> },
       { label: '颜色转换', path: '/color', icon: <Palette size={16} /> },
+      { label: '图片转换', path: '/imageconvert', icon: <Image size={16} /> },
     ],
   },
   {
