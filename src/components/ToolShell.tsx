@@ -1,6 +1,6 @@
 import { type ReactNode, useState, useCallback } from 'react'
 import { Copy, Check } from 'lucide-react'
-import AdBanner from './AdBanner'
+// import AdBanner from './AdBanner'
 
 interface ToolShellProps {
   title: string
@@ -18,7 +18,6 @@ export default function ToolShell({ title, description, children }: ToolShellPro
         )}
       </div>
       <div className="space-y-4">{children}</div>
-      <AdBanner adSlot="7667641569" className="mt-4" />
     </div>
   )
 }

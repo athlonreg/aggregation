@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /redirect
 
-Sitemap: https://lsby.netlify.app/sitemap.xml
+Sitemap: https://www.tlhub.cn/sitemap.xml
