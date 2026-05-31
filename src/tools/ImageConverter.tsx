@@ -381,11 +381,13 @@ function ImgCompress() {
           {results.map((r, i) => {
             const ratio = r.newSize < r.origSize ? ((1 - r.newSize / r.origSize) * 100).toFixed(1) : ((r.newSize / r.origSize - 1) * 100).toFixed(1)
             const saved = r.newSize < r.origSize
+            const ext = outputType === 'image/png' ? '.png' : outputType === 'image/webp' ? '.webp' : '.jpg'
+            const displayName = r.name.replace(/\.\w+$/, '') + ext
             return (
               <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50">
                 <FileImage size={16} className="text-gray-400 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-gray-800 dark:text-gray-200 truncate">{r.name}</div>
+                  <div className="text-sm text-gray-800 dark:text-gray-200 truncate">{displayName}</div>
                   <div className="text-xs text-gray-400">{formatSize(r.origSize)} → {formatSize(r.newSize)}</div>
                 </div>
                 <span className={`text-xs font-medium ${saved ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}>{saved ? '-' : '+'}{ratio}%</span>
