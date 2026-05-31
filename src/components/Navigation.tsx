@@ -162,9 +162,11 @@ export default function Navigation({ dark, onToggleTheme }: NavigationProps) {
           {filtered.map((cat, i) => (
             <div key={cat.title} id={cat.title}>
               <CategorySection category={cat} />
+              {/* Ad — temporarily disabled
               {(i + 1) % 4 === 0 && i < filtered.length - 1 && (
                 <AdBanner adSlot="5991597812" className="mb-6" />
               )}
+              */}
             </div>
           ))}
         </div>

@@ -367,10 +367,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Ad */}
+        {/* Ad — temporarily disabled
         <div className="mb-6 max-w-xl mx-auto">
           <AdBanner adSlot="7464461589" />
         </div>
+        */}
 
         {/* Entry buttons — single row, auto-wrap */}
         <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
