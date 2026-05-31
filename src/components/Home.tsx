@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, ChevronDown, Wrench, Compass, Rss } from 'lucide-react'
-import AdBanner from './AdBanner'
+// import AdBanner from './AdBanner'
 
 // ── Quote fetcher (hitokoto.cn API) ─────────────────────
 function useQuote() {
