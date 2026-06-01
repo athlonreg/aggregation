@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: process.env.BASE_PATH || '/',
+  base: process.env.BASE_PATH || (process.env.NODE_ENV === 'production' ? './' : '/'),
   optimizeDeps: {
     exclude: [
       '@wasm-fmt/ruff_fmt',

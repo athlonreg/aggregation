@@ -1,13 +1,20 @@
 {
   "name": "devtoolbox",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "套陆工具箱 - 免费在线开发工具桌面版",
+  "author": "套陆聚合站",
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:dev": "vite & electron .",
+    "electron:build": "tsc -b && vite build && electron-builder",
+    "electron:build:win": "tsc -b && vite build && electron-builder --win",
+    "electron:build:mac": "tsc -b && vite build && electron-builder --mac"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",
@@ -34,6 +41,47 @@
     "tailwindcss": "^4.3.0",
     "vite-plugin-wasm": "^3.6.0"
   },
+  "build": {
+    "appId": "cn.tlhub.devtoolbox",
+    "productName": "套陆工具箱",
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "!dist/**/*.map",
+      "!**/*.md",
+      "!**/LICENSE*",
+      "!**/CHANGELOG*",
+      "!**/docs",
+      "!**/test",
+      "!**/tests",
+      "!**/.github",
+      "!**/node_modules/.cache",
+      "!**/node_modules/@wasm-fmt/*/src",
+      "!**/node_modules/@wasm-fmt/*/target",
+      "!**/node_modules/@wasm-fmt/*/Cargo.toml",
+      "!**/node_modules/@wasm-fmt/*/package.json",
+      "!**/node_modules/prettier/plugins",
+      "!**/node_modules/typescript/lib/typescript.js",
+      "!**/node_modules/typescript/lib/tsserver.js"
+    ],
+    "asar": true,
+    "compression": "maximum",
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "public/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/crypto-js": "^4.2.2",
@@ -50,6 +98,8 @@
     "globals": "^17.6.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "electron": "^41.7.1",
+    "electron-builder": "^26.8.1"
   }
 }
